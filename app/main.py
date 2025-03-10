@@ -1,10 +1,10 @@
 import json
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as etree
 from abc import ABC, abstractmethod
 
-# Класс, хранящий данные книги
+
 class Book:
-    def __init__(self, title: str, content: str):
+    def __init__(self, title: str, content: str) -> None:
         self.title = title
         self.content = content
 
@@ -56,24 +56,27 @@ class JsonSerializer(BookSerializer):
 
 class XmlSerializer(BookSerializer):
     def serialize(self, book: Book) -> str:
-        root = ET.Element("book")
-        title_elem = ET.SubElement(root, "title")
+        root = etree.Element("book")
+        title_elem = etree.SubElement(root, "title")
         title_elem.text = book.title
-        content_elem = ET.SubElement(root, "content")
+        content_elem = etree.SubElement(root, "content")
         content_elem.text = book.content
-        return ET.tostring(root, encoding="unicode")
+        return etree.tostring(root, encoding="unicode")
+
 
 def main(book: Book, commands: list[tuple[str, str]]) -> None | str:
     result: None | str = None
     for command, method_type in commands:
         if command == "display":
             display_strategy: BookDisplayStrategy = (
-                ConsoleDisplay() if method_type == "console" else ReverseDisplay()
+                ConsoleDisplay() if method_type == "console"
+                else ReverseDisplay()
             )
             display_strategy.display(book)
         elif command == "print":
             print_strategy: BookPrintStrategy = (
-                ConsolePrinter() if method_type == "console" else ReversePrinter()
+                ConsolePrinter() if method_type == "console"
+                else ReversePrinter()
             )
             print_strategy.print_book(book)
         elif command == "serialize":
@@ -82,6 +85,7 @@ def main(book: Book, commands: list[tuple[str, str]]) -> None | str:
             )
             result = serializer.serialize(book)
     return result
+
 
 if __name__ == "__main__":
     sample_book = Book("Sample Book", "This is some sample content.")
